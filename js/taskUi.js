@@ -26,10 +26,27 @@ export default class TaskUI {
     
     taskListUi.innerHTML = '';
     
-    
+
+
+    // console.log(tasks.length);
+    // console.log(id);
+
+    let id;
+
+    if(tasks.length === 0){
+      id = 0;
+    }
+    // else{
+    //   id = tasks[tasks.length - 1].id;
+    //   id++;
+    // }
+
     tasks.forEach((task) => {
-      taskListUi.innerHTML += `
-      <li id="taskUi" class="list-group-item d-flex justify-content-between align-items-start">
+
+      const li = document.createElement('li');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+      li.id = `taskUi-${id}`;
+      li.innerHTML = `
         <div class="ms-2 me-auto">
           <div class="fw-bold">${task.taskName}</div>
           ${task.note}
@@ -43,8 +60,8 @@ export default class TaskUI {
           <a class="mx-1 fs-4 text-secondary" href="#" title="Edit Task"><i class="fas fa-edit"></i></a>
           <a class="mx-1 fs-4 text-danger" href="#" title="Delete Task"><i class="fas fa-trash"></i></a>
         </span>
-      </li>
       `
+      taskListUi.appendChild(li);
     })
   }
 
