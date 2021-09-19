@@ -1,12 +1,15 @@
-// import TaskData from './taskData.js';
-import {taskList} from './taskData.js';
+// import {taskList} from './taskData.js';
 import AddNewTask from './addNewTask.js';
 
 // const tasksList = new TaskData();
 
 // const tasks = tasksList.taskListData();
 
-const tasks = taskList;
+// const tasks = taskList;
+
+//Data from local storage
+const tasks = JSON.parse(localStorage.getItem('taskItems'));
+// console.log(tasks);
 
 export default class TaskUI {
   
@@ -18,6 +21,11 @@ export default class TaskUI {
     createTaskBtn.addEventListener('click', (e) => {
       this.createNewTask();
     })
+    // Remove Item 
+    const listUi = document.getElementById('taskListUi');
+    listUi.addEventListener('click', e => {
+      this.deleteTask(e);
+    })
   }
 
   showTaskToDOm(){
@@ -25,27 +33,12 @@ export default class TaskUI {
     const taskListUi = document.getElementById('taskListUi');
     
     taskListUi.innerHTML = '';
-    
-
-
-    // console.log(tasks.length);
-    // console.log(id);
-
-    let id;
-
-    if(tasks.length === 0){
-      id = 0;
-    }
-    // else{
-    //   id = tasks[tasks.length - 1].id;
-    //   id++;
-    // }
 
     tasks.forEach((task) => {
 
       const li = document.createElement('li');
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
-      li.id = `taskUi-${id}`;
+      li.id = `taskUi-${task.id}`;
       li.innerHTML = `
         <div class="ms-2 me-auto">
           <div class="fw-bold">${task.taskName}</div>
@@ -80,14 +73,48 @@ export default class TaskUI {
     const taskPriorityValue = taskPriority.value;
     const taskNoteValue = taskNote.value;
 
-    let addNewTask = new AddNewTask(tastNameValue, taskDateValue, taskStartTimeValue, taskEndTimeValue, taskPriorityValue, taskNoteValue);
+    let id;
+
+    if(tasks.length === 0){
+      id = 0;
+    }else{
+      id = tasks[tasks.length - 1].id;
+      id++;
+    }
+
+    let addNewTask = new AddNewTask(tastNameValue, taskDateValue, taskStartTimeValue, taskEndTimeValue, taskPriorityValue, taskNoteValue, id);
 
     // tasksList.taskListData.tasks = addNewTask;
     // this.tasks.taskList.push(addNewTask);
 
     tasks.push(addNewTask);
 
+    localStorage.setItem('taskItems', JSON.stringify(tasks));
+
     this.showTaskToDOm();
+
+  }
+
+  deleteTask(e){
+    e.preventDefault();
+    if(e.target.classList.contains('fa-trash')){
+      console.log('Item Will Be Deleted');
+      const deleteItem = e.target.parentElement.parentElement.parentElement;
+      const id = deleteItem.id;
+      deleteItem.remove();
+      this.deleteFromLocalStorage(id);
+    }
+  }
+
+  deleteFromLocalStorage(id){
+    const taskId = id.split('-');
+    const taskIDGet = taskId[1];
+
+    const filterOutTasks = tasks.filter(task => {
+      return task.id != taskIDGet;
+    })
+
+    localStorage.setItem('taskItems', JSON.stringify(filterOutTasks));
 
   }
 }
