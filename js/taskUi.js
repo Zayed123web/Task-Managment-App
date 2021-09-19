@@ -110,7 +110,9 @@ export default class TaskUI {
     const taskId = id.split('-');
     const taskIDGet = taskId[1];
 
-    const filterOutTasks = tasks.filter(task => {
+    const tasksFromLocal = JSON.parse(localStorage.getItem('taskItems'));
+
+    const filterOutTasks = tasksFromLocal.filter(task => {
       return task.id != taskIDGet;
     })
 
