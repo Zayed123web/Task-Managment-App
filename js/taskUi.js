@@ -26,6 +26,8 @@ export default class TaskUI {
     listUi.addEventListener('click', e => {
       this.deleteTask(e);
     })
+
+    this.viewDetails();
   }
 
   showTaskToDOm(){
@@ -48,7 +50,7 @@ export default class TaskUI {
           (${task.startTime} - ${task.endTime})
         </span>
         <span class="rounded-pill">
-          <a class="mx-1 fs-4 text-info" href="#" title="View Details"><i class="fas fa-eye"></i></a>
+          <a class="mx-1 fs-4 text-info" href="#" title="View Details"><i class="fas fa-eye" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
           <a class="mx-1 fs-4 text-success" href="#" title="Mark Complete"><i class="fas fa-check-circle"></i></a>
           <a class="mx-1 fs-4 text-secondary" href="#" title="Edit Task"><i class="fas fa-edit"></i></a>
           <a class="mx-1 fs-4 text-danger" href="#" title="Delete Task"><i class="fas fa-trash"></i></a>
@@ -119,4 +121,67 @@ export default class TaskUI {
     localStorage.setItem('taskItems', JSON.stringify(filterOutTasks));
 
   }
+}
+
+TaskUI.prototype.viewDetails = function(){
+  //Add Event Listners
+  const listUi = document.getElementById('taskListUi');
+  listUi.addEventListener('click', e => {
+    if(e.target.classList.contains('fa-eye')){
+
+
+      const viewItemId = e.target.parentElement.parentElement.parentElement;
+      const id = viewItemId.id;
+      const idSplit = id.split('-');
+      const getId = idSplit[1];
+      
+      // Get The Item From The Local Storge
+      const localTask = JSON.parse(localStorage.getItem('taskItems'));
+      const viewItemGot = localTask.filter(task => {
+        return task.id == getId;
+      })
+      // Add Modal
+      this.addModalViewTask(viewItemGot);
+    }
+  })
+}
+
+TaskUI.prototype.addModalViewTask = function(data){
+  const addModal = document.getElementById('exampleModal2');
+  const viewTask = document.getElementById('viewTaskDetail');
+  const viewData = data[0];
+  console.log(viewData);
+  viewTask.innerHTML = `
+
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-calendar-day"></i> Task Details</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="mb-3">
+          <label for="taskViewName" class="col-form-label">Task Name:</label>
+          <input value="${viewData.taskName}" type="text" class="form-control" id="taskViewName" disabled>
+        </div>
+        <div class="mb-3">
+          <label for="taskViewTime" class="col-form-label">Task Time:</label>
+          <input value="${viewData.startTime} to ${viewData.endTime}" type="text" class="form-control" id="taskViewTime" disabled>
+        </div>
+        <div class="mb-3">
+          <label for="taskViewDate" class="col-form-label">Task Date:</label>
+          <input value="${viewData.date}" type="text" class="form-control" id="taskViewDate" disabled>
+        </div>
+        <div class="mb-3">
+          <label for="taskViewNote" class="col-form-label">Task Note:</label>
+          <input value="${viewData.note}" type="text" class="form-control" id="taskViewNote" disabled>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-primary">Edit Task</button>
+    </div>
+
+  `;
+
 }
