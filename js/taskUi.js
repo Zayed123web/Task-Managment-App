@@ -11,6 +11,9 @@ import AddNewTask from './addNewTask.js';
 const tasks = JSON.parse(localStorage.getItem('taskItems'));
 // console.log(tasks);
 
+// Complete task
+const completedList = [];
+
 export default class TaskUI {
   
   init(){
@@ -32,6 +35,14 @@ export default class TaskUI {
 
     // Edit Details
     this.editDetails();
+
+    // Completed data
+    this.completedData();
+
+    // All Task
+    document.getElementById('allTask').addEventListener('click', (e) => {
+      this.showTaskToDOm();
+    })
   }
 
   showTaskToDOm(){
@@ -55,7 +66,7 @@ export default class TaskUI {
         </span>
         <span class="rounded-pill">
           <a class="mx-1 fs-4 text-info" href="#" title="View Details"><i class="fas fa-eye" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
-          <a class="mx-1 fs-4 text-success" href="#" title="Mark Complete"><i class="fas fa-check-circle"></i></a>
+          <a class="mx-1 fs-4 text-success" href="#" title="Mark Complete"><i class="fas fa-check-circle" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
           <a class="mx-1 fs-4 text-secondary" href="#" title="Edit Task"><i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
           <a class="mx-1 fs-4 text-danger" href="#" title="Delete Task"><i class="fas fa-trash"></i></a>
         </span>
@@ -309,11 +320,101 @@ TaskUI.prototype.showEditedDataUI = function(data){
       </span>
       <span class="rounded-pill">
         <a class="mx-1 fs-4 text-info" href="#" title="View Details"><i class="fas fa-eye" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
-        <a class="mx-1 fs-4 text-success" href="#" title="Mark Complete"><i class="fas fa-check-circle"></i></a>
+        <a class="mx-1 fs-4 text-success" href="#" title="Mark Complete"><i class="fas fa-check-circle" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
         <a class="mx-1 fs-4 text-secondary" href="#" title="Edit Task"><i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
         <a class="mx-1 fs-4 text-danger" href="#" title="Delete Task"><i class="fas fa-trash"></i></a>
       </span>
     `
     taskListUi.appendChild(li);
+  })
+}
+
+// Complete Button
+TaskUI.prototype.completedData = function () {
+    //Add Event Listners
+    const listUi = document.getElementById('taskListUi');
+    listUi.addEventListener('click', e => {
+      if(e.target.classList.contains('fa-check-circle')){
+  
+  
+        const viewItemId = e.target.parentElement.parentElement.parentElement;
+        const id = viewItemId.id;
+        const idSplit = id.split('-');
+        const getId = idSplit[1];
+        
+        // Get The Item From The Local Storge
+        const localTask = JSON.parse(localStorage.getItem('taskItems'));
+        const viewItemGot = localTask.filter(task => {
+          return task.id == getId;
+        })
+        // Add Modal
+        this.completedModal(viewItemGot);
+
+        console.log('Hello Peter')
+      }
+    })
+
+    // completed tab
+    this.showCompleted();
+}
+
+TaskUI.prototype.completedModal = function (data) {
+  const addModal = document.getElementById('exampleModal2');
+  const viewTask = document.getElementById('viewTaskDetail');
+  viewTask.innerHTML = `
+
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-check-circle"></i> Task Details</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="mb-3">
+          Are you sure?
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="completeConfirm">Confirm</button>
+    </div>`;
+  
+  this.confirmComplete(data);
+}
+
+TaskUI.prototype.confirmComplete = function (data) {
+  const dataId = data[0];
+  const confirmBtn = document.getElementById('completeConfirm');
+  confirmBtn.addEventListener('click', (e) => {
+    completedList.push(dataId);
+  })
+}
+
+// COmplete Tab Data Show
+TaskUI.prototype.showCompleted = function(){
+  const completeTaskBtn = document.getElementById('complete');
+  const liTasks = document.getElementById('taskListUi');
+  completeTaskBtn.addEventListener('click', (e) => {
+    liTasks.innerHTML = '';
+
+    completedList.forEach(task => {
+      const li = document.createElement('li');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start','priority-low');
+      li.id = `taskUi-${task.id}`;
+      li.innerHTML = `
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">${task.taskName}</div>
+          ${task.note}
+        </div>
+        <span class="rounded-pill mx-4 pt-2 fs-6 text-secondary">
+          (${task.startTime} - ${task.endTime})
+        </span>
+        <span class="rounded-pill">
+          <a class="mx-1 fs-4 text-info" href="#" title="View Details"><i class="fas fa-eye" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
+          <a class="mx-1 fs-4 text-danger" href="#" title="Delete Task"><i class="fas fa-trash"></i></a>
+        </span>`;
+
+        liTasks.appendChild(li);
+    })
   })
 }
