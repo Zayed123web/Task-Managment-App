@@ -349,8 +349,6 @@ TaskUI.prototype.completedData = function () {
         })
         // Add Modal
         this.completedModal(viewItemGot);
-
-        console.log('Hello Peter')
       }
     })
 
@@ -387,6 +385,17 @@ TaskUI.prototype.confirmComplete = function (data) {
   const confirmBtn = document.getElementById('completeConfirm');
   confirmBtn.addEventListener('click', (e) => {
     completedList.push(dataId);
+
+    // Delete From Local
+    const getDataId = dataId.id;
+    const tasksFromLocal = JSON.parse(localStorage.getItem('taskItems'));
+    const filterOutTasks = tasksFromLocal.filter(task => {
+      return task.id != getDataId;
+    })
+    localStorage.setItem('taskItems', JSON.stringify(filterOutTasks));
+
+   // Show Data
+   
   })
 }
 
