@@ -6,3 +6,32 @@
 #exampleModalLg{
   display: none;
 }
+
+
+.priority-high:after {
+  content: "";
+  background:orangered;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  width: 4px;
+  top: 0;
+}
+.priority-medium:after {
+  content: "";
+  background:rgb(219, 223, 16);
+  height: 100%;
+  position: absolute;
+  left: 0;
+  width: 4px;
+  top: 0;
+}
+.priority-low:after {
+  content: "";
+  background: rgb(4, 126, 20);
+  height: 100%;
+  position: absolute;
+  left: 0;
+  width: 4px;
+  top: 0;
+}

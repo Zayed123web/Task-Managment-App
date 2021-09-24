@@ -43,7 +43,7 @@ export default class TaskUI {
     tasks.forEach((task) => {
 
       const li = document.createElement('li');
-      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start','priority-low');
       li.id = `taskUi-${task.id}`;
       li.innerHTML = `
         <div class="ms-2 me-auto">
@@ -201,8 +201,6 @@ TaskUI.prototype.editDetails = function(){
       const id = viewItemId.id;
       const idSplit = id.split('-');
       const getId = idSplit[1];
-
-      console.log(getId);
       
       // Get The Item From The Local Storge
       const localTask = JSON.parse(localStorage.getItem('taskItems'));
@@ -211,6 +209,11 @@ TaskUI.prototype.editDetails = function(){
       })
       // Add Modal
       this.addModalEditTask(viewItemGot);
+
+      //Save Edited Data
+      this.saveEditedData(getId);
+
+      // Show data to UI
     }
   })
 }
@@ -220,9 +223,7 @@ TaskUI.prototype.addModalEditTask = function(data){
   const addModal = document.getElementById('exampleModal2');
   const viewTask = document.getElementById('viewTaskDetail');
   const viewData = data[0];
-  console.log(viewData);
   viewTask.innerHTML = `
-
     <div class="modal-header">
       <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-edit"></i> Edit Task</h5>
       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -249,9 +250,70 @@ TaskUI.prototype.addModalEditTask = function(data){
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      <button type="button" class="btn btn-primary">Save Task</button>
-    </div>
+      <button type="button" class="btn btn-primary" id="editSaved" data-bs-dismiss="modal">Save Task</button>
+    </div>`;
+};
 
-  `;
 
+TaskUI.prototype.saveEditedData = function(data){
+  const saveEdit = document.getElementById('editSaved');
+  saveEdit.addEventListener('click', (e) => {
+    const editData = data[0];
+    
+    const taskName = document.getElementById('taskViewName');
+    const taskTime = document.getElementById('taskViewTime');
+    const taskDate = document.getElementById('taskViewDate');
+    const taskNote = document.getElementById('taskViewNote');
+
+    const tastNameValue = taskName.value;
+    const taskTimeValue = taskTime.value;
+    const taskDateValue = taskDate.value;
+    const taskNoteValue = taskNote.value;
+
+    // Get The Item From The Local Storge
+    const localTask = JSON.parse(localStorage.getItem('taskItems'));
+    const editedData = localTask.map(task => {
+      if(editData == task.id){
+        return {
+          ...task,
+          taskName: tastNameValue
+        }
+      }else{
+        return task;
+      }
+    })
+
+    localStorage.setItem('taskItems', JSON.stringify(editedData));
+    this.showEditedDataUI(editedData);
+
+  })
+}
+
+TaskUI.prototype.showEditedDataUI = function(data){
+  const taskUi = document.querySelector('.taskUi');
+  const taskListUi = document.getElementById('taskListUi');
+  
+  taskListUi.innerHTML = '';
+
+  data.forEach(task => {
+    const li = document.createElement('li');
+    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start','priority-low');
+    li.id = `taskUi-${task.id}`;
+    li.innerHTML = `
+      <div class="ms-2 me-auto">
+        <div class="fw-bold">${task.taskName}</div>
+        ${task.note}
+      </div>
+      <span class="rounded-pill mx-4 pt-2 fs-6 text-secondary">
+        (${task.startTime} - ${task.endTime})
+      </span>
+      <span class="rounded-pill">
+        <a class="mx-1 fs-4 text-info" href="#" title="View Details"><i class="fas fa-eye" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
+        <a class="mx-1 fs-4 text-success" href="#" title="Mark Complete"><i class="fas fa-check-circle"></i></a>
+        <a class="mx-1 fs-4 text-secondary" href="#" title="Edit Task"><i class="fas fa-edit" data-bs-toggle="modal" data-bs-target="#exampleModal2" data-bs-whatever="@getbootstrap"></i></a>
+        <a class="mx-1 fs-4 text-danger" href="#" title="Delete Task"><i class="fas fa-trash"></i></a>
+      </span>
+    `
+    taskListUi.appendChild(li);
+  })
 }
